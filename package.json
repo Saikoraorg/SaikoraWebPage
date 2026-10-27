@@ -1,0 +1,29 @@
+{
+  "name": "saikora-pagina",
+  "version": "1.0.0",
+  "description": "Sitio web oficial de Saikora - Soluciones Tecnológicas a Medida",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
+    "next": "^15.3.3",
+    "nodemailer": "^10.2.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.3.3",
+    "typescript": "^5.8.3"
+  }
+}
