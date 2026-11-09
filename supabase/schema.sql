@@ -435,3 +435,23 @@ SET
   titulo_proyecto = EXCLUDED.titulo_proyecto,
   descripcion = EXCLUDED.descripcion,
   resultado_valor = EXCLUDED.resultado_valor;
+
+-- ============================================================
+-- 11. HABILITAR TIEMPO REAL (Supabase Realtime para Dashboard Admin)
+-- ============================================================
+-- Habilita réplica de eventos en tiempo real para las tablas operativas
+DO $$
+BEGIN
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.contactos;
+  EXCEPTION WHEN duplicate_object THEN
+    -- Ya existe en la publicación
+  END;
+
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.reuniones;
+  EXCEPTION WHEN duplicate_object THEN
+    -- Ya existe en la publicación
+  END;
+END $$;
+
