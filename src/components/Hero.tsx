@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import Image from 'next/image'
 
@@ -22,15 +22,15 @@ export default function Hero() {
             {/* Main Heading */}
             <h1 className="hero-title">
               Automatiza tu negocio,
-              <br />
-              escala sin límites con
-              <br />
-              <span className="highlight">tecnología a medida</span>
+              <br className="d-none d-md-inline" />
+              {' '}escala sin límites con
+              <br className="d-none d-md-inline" />
+              {' '}<span className="highlight">tecnología a medida</span>
             </h1>
 
             {/* Description */}
             <p className="hero-desc">
-              En Saikora desarrollamos soluciones tecnológicas a medida para
+              Desarrollamos soluciones tecnológicas a medida para
               automatizar procesos, crear sitios web, desarrollar sistemas y
               llevar tu negocio al siguiente nivel.
             </p>
@@ -54,59 +54,17 @@ export default function Hero() {
           <div className="col-lg-6">
             <div className="hero-visual">
               {/* Glowing Pedestal Base */}
-              <div
-                style={{
-                  position: 'absolute',
-                  width: '380px',
-                  height: '110px',
-                  borderRadius: '50%',
-                  bottom: '50px',
-                  background:
-                    'radial-gradient(ellipse at center, rgba(25, 195, 160, 0.4) 0%, rgba(76, 91, 255, 0.25) 50%, transparent 75%)',
-                  boxShadow: '0 0 60px rgba(25, 195, 160, 0.35)',
-                  filter: 'blur(10px)',
-                  zIndex: 1,
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  width: '320px',
-                  height: '75px',
-                  borderRadius: '50%',
-                  bottom: '68px',
-                  border: '1.5px solid rgba(25, 195, 160, 0.4)',
-                  background: 'rgba(255, 255, 255, 0.45)',
-                  backdropFilter: 'blur(12px)',
-                  boxShadow: 'inset 0 2px 14px rgba(255, 255, 255, 0.9), 0 16px 36px rgba(26, 30, 41, 0.08)',
-                  zIndex: 2,
-                }}
-              />
+              <div className="hero-pedestal-glow" />
+              <div className="hero-pedestal-ring" />
 
               {/* Central 3D Ribbon S sculpture */}
-              <div
-                className="hero-logo-3d position-relative"
-                style={{
-                  zIndex: 3,
-                  width: '310px',
-                  height: '350px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <div className="hero-logo-3d position-relative">
                 <Image
                   src="/saikora-icon.png"
                   alt="Saikora 3D Visual"
-                  width={310}
-                  height={350}
-                  style={{
-                    objectFit: 'contain',
-                    width: '100%',
-                    height: '100%',
-                    filter:
-                      'drop-shadow(0 25px 35px rgba(26, 30, 41, 0.2)) drop-shadow(0 0 45px rgba(25, 195, 160, 0.3))',
-                  }}
+                  width={510}
+                  height={682}
+                  className="hero-ribbon-img"
                   priority
                 />
               </div>

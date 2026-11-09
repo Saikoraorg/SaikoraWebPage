@@ -145,142 +145,74 @@ export default function Stats() {
   }, [selectedClient])
 
   return (
-    <section className="stats-section-v2" id="nosotros" style={{ background: '#FBFBFD', padding: '1.5rem 0 5.5rem' }}>
+    <section className="stats-section-v2" id="nosotros">
       <div className="container position-relative" style={{ zIndex: 1 }}>
         <ScrollReveal>
           {/* Main Floating Pill Container */}
-          <div
-            className="stats-pill-container shadow-sm position-relative overflow-hidden"
-            style={{
-              background: '#FFFFFF',
-              borderRadius: '40px',
-              border: '1.5px solid rgba(226, 232, 240, 0.85)',
-              padding: '1.6rem 2.8rem',
-              boxShadow: '0 18px 45px rgba(26, 30, 41, 0.05)',
-            }}
-          >
-            <div
-              className="d-flex align-items-center justify-content-between flex-nowrap"
-              style={{
-                gap: '1.5rem',
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-              }}
-            >
+          <div className="stats-pill-container shadow-sm position-relative">
+            <div className="stats-pill-grid">
               {/* ITEM 1: Manejamos tus proyectos a tu gusto */}
-              <div
-                className="stat-pill-item d-flex align-items-center gap-3 flex-shrink-0"
-                style={{ padding: '0.4rem 0.6rem' }}
-              >
-                <div
-                  className="stat-icon-box d-flex align-items-center justify-content-center shadow-xs"
-                  style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '16px',
-                    background: '#EEF2FF',
-                    color: '#4C5BFF',
-                    fontSize: '1.25rem',
-                    flexShrink: 0,
-                  }}
-                >
+              <div className="stat-pill-item stat-pill-lead">
+                <div className="stat-icon-box stat-icon-blue">
                   <i className="fa-solid fa-rocket" />
                 </div>
-                <div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1A1E29', lineHeight: 1.25 }}>
+                <div className="stat-pill-text">
+                  <div className="stat-pill-title">
                     Manejamos tus proyectos
                   </div>
-                  <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#4C5BFF', lineHeight: 1.25 }}>
+                  <div className="stat-pill-sub-blue">
                     a tu gusto
                   </div>
                 </div>
               </div>
 
               {/* ITEM 2: Diferentes nichos */}
-              <div className="stat-pill-item d-flex align-items-center gap-3 flex-shrink-0" style={{ padding: '0.4rem 0.6rem' }}>
-                <div
-                  className="stat-icon-box d-flex align-items-center justify-content-center shadow-xs"
-                  style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '16px',
-                    background: '#E6FAF6',
-                    color: '#19C3A0',
-                    fontSize: '1.25rem',
-                    flexShrink: 0,
-                  }}
-                >
+              <div className="stat-pill-item stat-pill-metric">
+                <div className="stat-icon-box stat-icon-teal">
                   <i className="fa-solid fa-store" />
                 </div>
-                <div>
-                  <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#1A1E29', lineHeight: 1 }}>
+                <div className="stat-pill-text">
+                  <div className="stat-pill-num">
                     8+
                   </div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 500, color: '#64748b', whiteSpace: 'nowrap' }}>
+                  <div className="stat-pill-desc">
                     Nichos para tu negocio
                   </div>
                 </div>
               </div>
 
-              {/* ITEM 3: Ver productos destacados de nuestros clientes (interactive) */}
-              <div
-                className="stat-pill-item d-flex align-items-center gap-3 flex-shrink-0"
-                onClick={() => setSelectedClient(clientProjects[0])}
-                role="button"
-                tabIndex={0}
-                style={{
-                  cursor: 'pointer',
-                  padding: '0.4rem 0.6rem',
-                }}
-                title="Ver productos destacados de nuestros clientes"
-              >
-                <div
-                  className="stat-icon-box d-flex align-items-center justify-content-center shadow-xs"
-                  style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '16px',
-                    background: 'var(--grad-primary)',
-                    color: '#FFFFFF',
-                    fontSize: '1.25rem',
-                    flexShrink: 0,
-                  }}
-                >
-                  <i className="fa-solid fa-star" />
+              {/* ITEM 3: 24/7 Soporte */}
+              <div className="stat-pill-item stat-pill-metric">
+                <div className="stat-icon-box stat-icon-blue">
+                  <i className="fa-solid fa-shield-halved" />
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#1A1E29', lineHeight: 1.25 }}>
-                    Ver productos destacados
+                <div className="stat-pill-text">
+                  <div className="stat-pill-num">
+                    24/7
                   </div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#19C3A0', lineHeight: 1.25 }}>
-                    de nuestros clientes →
+                  <div className="stat-pill-desc">
+                    Soporte y mantenimiento
                   </div>
                 </div>
               </div>
 
-              {/* ITEM 4: 24/7 Soporte */}
-              <div className="stat-pill-item d-flex align-items-center gap-3 flex-shrink-0" style={{ padding: '0.4rem 0.6rem' }}>
-                <div
-                  className="stat-icon-box d-flex align-items-center justify-content-center shadow-xs"
-                  style={{
-                    width: '52px',
-                    height: '52px',
-                    borderRadius: '16px',
-                    background: '#EEF2FF',
-                    color: '#4C5BFF',
-                    fontSize: '1.25rem',
-                    flexShrink: 0,
-                  }}
-                >
-                  <i className="fa-solid fa-shield-halved" />
+              {/* ITEM 4: Ver productos destacados de nuestros clientes (interactive) */}
+              <div
+                className="stat-pill-item stat-pill-interactive"
+                onClick={() => setSelectedClient(clientProjects[0])}
+                role="button"
+                tabIndex={0}
+                title="Ver productos destacados de nuestros clientes"
+              >
+                <div className="stat-icon-box stat-icon-primary">
+                  <i className="fa-solid fa-star" />
                 </div>
-                <div>
-                  <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#1A1E29', lineHeight: 1 }}>
-                    24/7
+                <div className="stat-pill-text">
+                  <div className="stat-pill-cta-label">
+                    Ver productos destacados
                   </div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 500, color: '#64748b', whiteSpace: 'nowrap' }}>
-                    Soporte y mantenimiento
+                  <div className="stat-pill-cta-link">
+                    de nuestros clientes →
                   </div>
                 </div>
               </div>

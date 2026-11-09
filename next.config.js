@@ -38,7 +38,10 @@ const securityHeaders = [
   },
 ]
 
+const path = require('path')
+
 const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname),
   serverExternalPackages: ['xlsx'],
   reactStrictMode: true,
   poweredByHeader: false, // Disables X-Powered-By: Next.js to prevent tech stack fingerprinting
