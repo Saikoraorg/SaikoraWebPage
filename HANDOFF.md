@@ -1,9 +1,9 @@
 # 📋 SAIKORA — Handoff Técnico y Documentación del Proyecto
 
-> **Versión del Documento:** 1.1.0  
-> **Última Actualización:** 18 de Octubre, 2026  
-> **Estado del Proyecto:** ✅ Frontend v1.1 Completo / Cards Rediseñadas / Modal de Clientes Activo / Seguridad Blindada y Verificada  
-> **Nota de Mantenimiento:** *Este archivo es un documento vivo que se actualiza continuamente conforme evoluciona el proyecto, se completan tareas pendientes o se añaden nuevas funcionalidades.*
+> **Versión del Documento:** 2.0.0  
+> **Última Actualización:** 09 de Noviembre, 2026  
+> **Estado del Proyecto:** ✅ Fase 2 Completa — Frontend v2 · DB Supabase · Admin Dashboard · Tiempo Real  
+> **Nota de Mantenimiento:** *Este archivo es un documento vivo que se actualiza continuamente conforme evoluciona el proyecto.*
 
 ---
 
@@ -13,25 +13,35 @@
 2. [Estructura de Archivos y Carpetas](#-estructura-de-archivos-y-carpetas)
 3. [Sistema de Diseño e Identidad Visual](#-sistema-de-diseño-e-identidad-visual)
 4. [Detalle y Funcionamiento de Cada Componente](#-detalle-y-funcionamiento-de-cada-componente)
-5. [Backend, API y Conexión con Supabase](#-backend-api-y-conexión-con-supabase)
-6. [Flujo de Ejecución y Comandos Útiles](#-flujo-de-ejecución-y-comandos-útiles)
-7. [Backlog Activo y Tareas Pendientes (Roadmap)](#-backlog-activo-y-tareas-pendientes-roadmap)
+5. [Base de Datos — Arquitectura Supabase](#-base-de-datos--arquitectura-supabase)
+6. [Backend, API y Conexión con Supabase](#-backend-api-y-conexión-con-supabase)
+7. [Consola Administrativa /admin](#-consola-administrativa-admin)
+8. [Variables de Entorno y Configuración](#-variables-de-entorno-y-configuración)
+9. [Despliegue: GitHub + Vercel](#-despliegue-github--vercel)
+10. [Seguridad](#️-seguridad)
+11. [Backlog Activo y Roadmap](#-backlog-activo-y-roadmap)
 
 ---
 
 ## 🧭 Visión General
 
-**Saikora** es una plataforma web corporativa moderna y de alta gama orientada a la venta y exposición de servicios tecnológicos especializados:
-- **Desarrollo Web:** Sitios modernos, rápidos y optimizados para conversión.
-- **Automatización de Procesos:** Flujos inteligentes que reducen tareas repetitivas y tiempos operativos.
-- **Sistemas a Medida:** Plataformas SaaS, software interno y aplicaciones empresariales.
+**Saikora** es una plataforma web corporativa moderna orientada a la venta y exposición de servicios tecnológicos especializados: Desarrollo Web, Automatización de Procesos y Sistemas a Medida.
 
 ### Stack Tecnológico
-- **Framework:** Next.js 15+ (App Router con React 19)
+- **Framework:** Next.js 15.5.28 (App Router con React 19)
 - **Lenguaje:** TypeScript 5.8+ (Target ES2020)
 - **Estilos:** CSS Vanilla estructurado con Custom Properties + Bootstrap 5 para grid responsive
 - **Iconos:** Font Awesome 6 (vía CDN global con soporte de marcas y SVGs)
-- **Base de Datos / BaaS:** Supabase (PostgreSQL, Row Level Security, Triggers automáticos)
+- **Base de Datos / BaaS:** Supabase (PostgreSQL, Row Level Security, Triggers automáticos, Realtime)
+- **Hosting:** Vercel (producción) · GitHub (repositorio)
+
+### URLs de Producción
+| Entorno | URL |
+|---|---|
+| Producción (Vercel) | `https://saikoraorg.vercel.app` |
+| Dominio Personalizado | `https://saikora.org` *(requiere DNS en Vercel → ver sección Despliegue)* |
+| Admin Dashboard | `https://saikoraorg.vercel.app/admin` |
+| Repositorio | `https://github.com/Saikoraorg/SaikoraWebPage` |
 
 ---
 
@@ -40,38 +50,45 @@
 ```text
 Saikora Pagina/
 ├── public/                                # Activos estáticos públicos
-│   ├── saikora-icon.png                   # Ícono de cinta 3D con fondo transparente
+│   ├── saikora-icon.png                   # Ícono de cinta 3D (sin fondo, RGBA, 510×682)
 │   ├── saikora-logo.png                   # Logotipo completo oficial (cinta + tipografía)
-│   ├── saikora-logo-darkbg.png            # Logotipo optimizado con texto blanco para fondos oscuros
-│   └── saikora-logo.jpg                   # Activo original de marca (master reference)
+│   ├── saikora-logo-darkbg.png            # Logotipo optimizado para fondos oscuros (texto blanco)
+│   └── saikora-logo.jpg                   # Activo original de marca (referencia maestra)
 ├── src/
 │   ├── app/
 │   │   ├── api/
-│   │   │   └── contact/
-│   │   │       └── route.ts               # Endpoint POST para recepción de solicitudes y guardado
-│   │   ├── globals.css                    # Design System v2, variables de color, animaciones y media queries
-│   │   ├── layout.tsx                     # Root layout, CDN de Bootstrap 5, Font Awesome 6 y metadatos SEO
+│   │   │   ├── contact/
+│   │   │   │   └── route.ts               # POST /api/contact — recepción de cotizaciones con rate limiter
+│   │   │   ├── agendar-reunion/
+│   │   │   │   └── route.ts               # POST /api/agendar-reunion — agendamiento de reuniones
+│   │   │   └── admin/
+│   │   │       └── data/
+│   │   │           └── route.ts           # GET/PATCH /api/admin/data — datos del dashboard (protegido)
+│   │   ├── admin/
+│   │   │   └── page.tsx                   # Ruta /admin — Consola administrativa privada (PIN auth)
+│   │   ├── globals.css                    # Design System v2, variables, animaciones y media queries
+│   │   ├── layout.tsx                     # Root layout, CDN Bootstrap 5, Font Awesome 6 y metadatos SEO
 │   │   └── page.tsx                       # Ensamblador de la página de inicio (HomePage)
 │   ├── components/
 │   │   ├── Navbar.tsx                     # Barra de navegación flotante con blur dinámico y menú móvil
 │   │   ├── Hero.tsx                       # Hero section con escultura 3D, badges flotantes y CTA
-│   │   ├── Services.tsx                   # Grid de servicios con mockups ilustrados y hover effects
-│   │   ├── Stats.tsx                      # Métricas clave en fondo dark navy con resplandores
-│   │   ├── Cases.tsx                      # Casos de éxito con carrusel, interfaces y badges de porcentaje
-│   │   ├── Contact.tsx                    # Formulario de cotización conectado + tarjetas de reunión directa
-│   │   ├── Footer.tsx                     # Pie de página corporativo con enlaces y redes sociales
+│   │   ├── Services.tsx                   # Carrusel horizontal táctil/arrastrable de servicios
+│   │   ├── Stats.tsx                      # Métricas clave en grid 2×2 responsive (navy bg)
+│   │   ├── Cases.tsx                      # Casos de éxito con carrusel e interfaces de mockup
+│   │   ├── Contact.tsx                    # Formulario de cotización + modal de agendamiento
+│   │   ├── Footer.tsx                     # Pie de página corporativo con redes sociales
 │   │   ├── SaikoraLogo.tsx                # Componente reutilizable del logo oficial (claro/oscuro)
-│   │   └── ScrollReveal.tsx               # Wrapper de animación con IntersectionObserver y blur progresivo
+│   │   └── ScrollReveal.tsx               # Wrapper de animación con IntersectionObserver
 │   ├── lib/
-│   │   └── supabase.ts                    # Clientes de Supabase (público y servidor con service role)
+│   │   └── supabase.ts                    # Clientes de Supabase (público y servidor service role)
 │   └── types/
-│       └── index.ts                       # Definiciones de tipos TypeScript para formularios y modelos
+│       └── index.ts                       # Tipos TypeScript para formularios, leads, reuniones y analytics
 ├── supabase/
-│   ├── schema.sql                         # Script SQL DDL con tablas, RLS, políticas y triggers
-│   └── SETUP.md                           # Guía rápida paso a paso para configurar Supabase
+│   ├── schema.sql                         # Script SQL COMPLETO — tablas, RLS, vistas, triggers, seed data
+│   └── SETUP.md                           # Guía paso a paso para configurar Supabase
 ├── .env.local.example                     # Plantilla de variables de entorno requeridas
-├── HANDOFF.md                             # Este documento de handoff técnico
-├── next.config.js                         # Configuración de compilación Next.js
+├── HANDOFF.md                             # Este documento de handoff técnico (v2.0)
+├── next.config.js                         # Configuración de compilación Next.js con headers de seguridad
 ├── package.json                           # Dependencias y scripts del proyecto
 ├── README.md                              # Documentación general del repositorio
 └── tsconfig.json                          # Configuración de TypeScript
@@ -85,10 +102,10 @@ Saikora Pagina/
 
 | Token CSS | Hex | Uso Principal |
 | :--- | :--- | :--- |
-| `--sk-teal` | `#19C3A0` | Verde azulado/turquesa de marca, botones principales, acentos destacados |
-| `--sk-navy` | `#1A1E29` | Azul marino oscuro profundo, títulos principales, fondos de contraste |
+| `--sk-teal` | `#19C3A0` | Verde azulado/turquesa de marca, botones principales, acentos |
+| `--sk-navy` | `#1A1E29` | Azul marino oscuro profundo, títulos, fondos de contraste |
 | `--sk-blue` | `#4C5BFF` | Azul cobalto/eléctrico, degradados complementarios, enlaces |
-| `--sk-cream` | `#F5F4EF` | Crema/marfil suave, fondo principal del sitio, transmite elegancia |
+| `--sk-cream` | `#F5F4EF` | Crema/marfil suave, fondo principal del sitio |
 
 ### Degradados Clave
 - **Primario (`--grad-primary`):** `linear-gradient(135deg, #19C3A0 0%, #4C5BFF 100%)`
@@ -96,194 +113,223 @@ Saikora Pagina/
 - **Superficie Oscura (`--grad-dark`):** `linear-gradient(160deg, #1A1E29 0%, #252b3b 100%)`
 
 ### Tipografía
-- **Familia:** `Inter` (Google Fonts), cargada con pesos 300 a 900.
+- **Familia:** `Inter` (Google Fonts), pesos 300–900.
 - **Escala de títulos:** `clamp(2rem, 4vw, 3.8rem)` con `letter-spacing: -0.025em`.
-- **Efecto de texto en degradado:** Clase `.grad-text` con recorte de fondo sobre texto transparente.
+- **Texto en degradado:** Clase `.grad-text` con clip sobre fondo transparente.
 
 ---
 
 ## 🧩 Detalle y Funcionamiento de Cada Componente
 
-### 1. `Navbar.tsx` ([src/components/Navbar.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Navbar.tsx))
-- **Mecanismo:** Escucha el evento `window.onscroll` con un umbral de `20px`. Al superarlo, inyecta la clase `.scrolled`.
-- **Estilos:**
-  - En estado inicial: Fondo transparente.
-  - En estado `.scrolled`: Fondo `rgba(245, 244, 239, 0.92)` con `backdrop-filter: blur(24px)` y borde inferior sutil.
-- **Enlaces:** Clase `.sk-nav-link` con pseudoelemento `::after` animado que se expande horizontalmente al hacer hover.
-- **Menú Móvil:** Toggle controlado por estado React con animaciones y cierre automático al seleccionar una sección.
-- **CTA:** Botón `.btn-sk-primary` con flecha `fa-solid fa-arrow-right`.
+### 1. `Navbar.tsx`
+- Escucha `window.onscroll` con umbral de `20px`. Al superarlo, inyecta clase `.scrolled` → fondo `rgba(245, 244, 239, 0.92)` con `backdrop-filter: blur(24px)`.
+- Menú móvil con toggle React, cierre automático al seleccionar sección.
 
-### 2. `Hero.tsx` ([src/components/Hero.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Hero.tsx))
-- **Mecanismo:** Estructura en dos columnas (Copy persuasivo a la izquierda + Escultura visual a la derecha).
-- **Escultura 3D:**
-  - Pedestal con doble elipse brillante y resplandor radial difuminado (`box-shadow: 0 0 60px rgba(25, 195, 160, 0.35)`).
-  - Ícono oficial de Saikora (`/saikora-icon.png`) con animación `heroFloat` de levitación continua.
-- **Tarjetas Flotantes:**
-  - `fc-1`: "Automatiza tus procesos" (`fa-solid fa-gears`).
-  - `fc-2`: "Sitios web que impulsan" (`fa-solid fa-globe`).
-  - `fc-3`: "Sistemas a medida" (`fa-solid fa-code`).
-  - Animadas con delays desfasados para generar sensación de tridimensionalidad viva.
-- **Scroll Indicator:** Icono de ratón (`fa-solid fa-computer-mouse`) con línea vertical pulsante que guía al usuario hacia la siguiente sección.
+### 2. `Hero.tsx`
+- Dos columnas: copy persuasivo (izq) + escultura 3D (der).
+- **Escultura 3D:** Pedestal con doble elipse brillante + ícono `/saikora-icon.png` con animación `heroFloat`.
+- **Tarjetas flotantes:** `fc-1` Automatiza · `fc-2` Sitios web · `fc-3` Sistemas a medida. Animadas con delays desfasados.
+- **Scroll indicator:** ícono `fa-solid fa-computer-mouse` con línea vertical pulsante.
 
-### 3. `Services.tsx` ([src/components/Services.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Services.tsx))
-- **Mecanismo:** Renderiza las 3 ofertas centrales de Saikora mediante un array dinámico de datos.
-- **Previsualizaciones en vivo (Mockups UI):**
-  - **Desarrollo Web:** Mini navegador con barra de URL (`saikora.com/web`), botones de ventana y tarjetas de contenido.
-  - **Automatización:** Nodos de flujo interconectados con badges de robot y rayo.
-  - **Sistemas a Medida:** Gráfico de barras ascendente con indicador de crecimiento `+98.4%`.
-- **Efectos Hover:**
-  - Elevación vertical de `10px`.
-  - Despliegue de línea superior en degradado mediante `scaleX(1)`.
-  - El botón circular inferior transiciona a degradado completo y desplaza su flecha hacia la derecha.
+### 3. `Services.tsx` *(Carrusel Interactivo v2)*
+- Carrusel horizontal infinito con:
+  - **Touch swipe** en móvil (eventos `touchstart`/`touchend`).
+  - **Drag-to-scroll** en desktop (eventos `mousedown`/`mousemove`/`mouseup`).
+  - **Auto-scroll** con pausa de 1600ms tras interacción y retoma suave.
+  - Loop infinito con clonado de tarjetas (3 duplicados al final).
 
-### 4. `Stats.tsx` ([src/components/Stats.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Stats.tsx))
-- **Mecanismo:** 4 tarjetas de métricas en fondo oscuro (`--sk-navy`) con dos orbes de resplandor difuso de fondo.
-- **Métricas:**
-  - `+10` Proyectos completados (`fa-solid fa-rocket`)
-  - `100%` Clientes satisfechos (`fa-solid fa-users`)
-  - `+3` Años de experiencia (`fa-solid fa-chart-line`)
-  - `24/7` Soporte y mantenimiento (`fa-solid fa-shield-halved`)
-- **Valores:** Tipografía en 2.4rem con relleno en degradado turquesa-azul.
+### 4. `Stats.tsx` *(Grid Responsive v2)*
+- 4 métricas clave en grid `2×2` responsive (evita clipping en mobile).
+- Fondo `--sk-navy` con orbes de resplandor difuso.
+- Modal popup glassmorphism de proyectos al hacer clic en `+10 Proyectos`.
 
-### 5. `Cases.tsx` ([src/components/Cases.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Cases.tsx))
-- **Mecanismo:** Carrusel de proyectos destacados con navegación cíclica anterior/siguiente (`prev` y `next`).
-- **Casos Implementados:**
-  - **Restaurante La Finca:** Sistema de comandas y stock (`60% en tiempo de pedidos`).
-  - **Tienda Online:** E-commerce escalable (`45% en ventas`).
-  - **Logística Express:** Seguimiento en tiempo real y CRM (`70% en tiempos de respuesta`).
-- **Diseño de Tarjeta:** Contenedor dark luxury con micro-pantalla simulada según categoría y medidor circular de porcentaje en la base.
+### 5. `Cases.tsx`
+- Carrusel de proyectos destacados con navegación `prev`/`next`.
+- Incluye: Restaurante La Finca · Estudio Nicole Valerio · Logística Express · On Fleek.
+- Tarjeta dark luxury con micro-pantalla simulada y medidor circular de porcentaje.
 
-### 6. `Contact.tsx` ([src/components/Contact.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Contact.tsx))
-- **Mecanismo:** Formulario controlado mediante `useState` con validación en tiempo real.
-- **Estructura en 3 Columnas:**
-  - **Izquierda:** Propuesta de valor, logo Saikora blanco y beneficios (`Agenda una reunión`, `Solicita una cotización`).
-  - **Centro:** Tarjeta blanca flotante de alta legibilidad con inputs redondeados y botón submit con estado de carga (`spinner`).
-  - **Derecha:** Tarjeta blanca para agendar llamada directa vía Calendly y datos de contacto rápido (email, teléfono y ubicación en San José, Costa Rica).
-- **Modo Resiliente:** Si Supabase no tiene llaves válidas aún, el formulario entra automáticamente en **Modo Demo**, validando datos, simulando el envío exitoso e imprimiendo el payload en consola para no bloquear pruebas de interfaz.
+### 6. `Contact.tsx`
+- Formulario controlado `useState` con validación en tiempo real.
+- 3 columnas: valor de marca · formulario · tarjeta de llamada directa.
+- **Modo Resiliente:** Si Supabase no está configurado, entra en modo demo (simula éxito sin romper UI).
 
-### 7. `Footer.tsx` ([src/components/Footer.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Footer.tsx))
-- **Mecanismo:** Pie de página sobrio (`#10131c`) con divisor superior de 1px.
-- **Elementos:**
-  - Logotipo oficial en blanco (`textColor="#FFFFFF"`).
-  - Enlaces de navegación con scroll suave a anchors de la página.
-  - Botones sociales con iconos de Font Awesome: LinkedIn (`fa-brands fa-linkedin-in`), Instagram (`fa-brands fa-instagram`), YouTube (`fa-brands fa-youtube`).
-  - Tags de marca con rombos separadores: `Ideas ✦ Tecnología ✦ Resultados`.
+### 7. `SaikoraLogo.tsx`
+- Props: `size?: number`, `showText?: boolean`, `textColor?: string`.
 
-### 8. `SaikoraLogo.tsx` ([src/components/SaikoraLogo.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/SaikoraLogo.tsx))
-- **Propósito:** Componente único y centralizado para la renderización del logo.
-- **Props:**
-  - `size?: number` (controla tanto la cinta como la escala de la tipografía proporcionalmente, por defecto `38`).
-  - `showText?: boolean` (permite ocultar la tipografía si solo se necesita el isotipo).
-  - `textColor?: string` (color del texto "KORA", por defecto `#1A1E29`; en modo oscuro se pasa `#FFFFFF`).
+### 8. `ScrollReveal.tsx`
+- `IntersectionObserver` con umbral `0.12`.
+- `.sr-hidden` → `.sr-visible`: opacidad 0→1, `translateY(36px)→0`, `blur(8px)→0`. Soporta `delay` en ms.
 
-### 9. `ScrollReveal.tsx` ([src/components/ScrollReveal.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/ScrollReveal.tsx))
-- **Mecanismo:** Utiliza la API nativa de `IntersectionObserver` con un umbral de `0.12`.
-- **Efecto Visual:** Inicialmente los elementos tienen `.sr-hidden` (`opacity: 0`, `translateY(36px)` y `filter: blur(8px)`). Al intersectar la pantalla, se añade `.sr-visible`, transformando de forma fluida el elemento hacia opacidad 1, posición neutral y nitidez total (`blur(0px)`). Soporta `delay` en milisegundos para animaciones escalonadas.
+---
+
+## 🗄️ Base de Datos — Arquitectura Supabase
+
+> Script completo en [`supabase/schema.sql`](./supabase/schema.sql). Correrlo en el SQL Editor de Supabase.
+
+### Tablas
+
+| Tabla | Propósito |
+|---|---|
+| `public.contactos` | Leads/prospectos de cotización (formulario web) |
+| `public.reuniones` | Citas agendadas desde el modal de llamadas |
+| `public.servicios` | Catálogo dinámico de servicios de Saikora |
+| `public.proyectos` | Portafolio de casos de éxito |
+| `public.eventos_analitica` | Tracking del embudo de conversión (sin cookies) |
+
+### Vistas Analíticas (SQL Views)
+
+| Vista | Datos |
+|---|---|
+| `v_analisis_servicios` | Demanda por servicio, % del total, leads calificados |
+| `v_analisis_reuniones` | Tasa de asistencia por plataforma (Meet, Zoom, etc.) |
+| `v_leads_pendientes` | Bandeja operativa — leads nuevos/en revisión con urgencia |
+| `v_proximas_reuniones` | Agenda próximos 7 días (estado agendada/confirmada) |
+
+### Seguridad (RLS)
+- **Contactos / Reuniones / Analytics:** Inserción pública ✅ · Lectura y edición solo autenticados 🔒
+- **Servicios / Proyectos:** Lectura pública (solo activos) ✅ · Gestión completa solo autenticados 🔒
+
+### Realtime
+Las tablas `contactos` y `reuniones` están en la publicación `supabase_realtime` para sincronización bidireccional en el admin dashboard.
+
+### Cómo correr el schema
+1. Ir a [supabase.com](https://supabase.com) → tu proyecto → **SQL Editor**
+2. Pegar el contenido de `supabase/schema.sql`
+3. Presionar **Run** ✅
+4. ¡Las tablas, índices, triggers, políticas RLS y datos semilla quedan listos!
 
 ---
 
 ## ⚡ Backend, API y Conexión con Supabase
 
-### 1. Endpoint de Contacto (`/api/contact`)
-- **Ubicación:** [src/app/api/contact/route.ts](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/app/api/contact/route.ts)
-- **Método:** `POST`
-- **Validaciones:**
-  - Existencia de todos los campos obligatorios (`nombre`, `email`, `servicio`, `mensaje`).
-  - Formato válido de dirección de correo electrónico mediante expresión regular.
-- **Lógica de Conexión:**
-  - Verifica si `NEXT_PUBLIC_SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` están definidas y no corresponden al valor placeholder.
-  - Si no están configuradas: Responde con status 200 en modo demo.
-  - Si están configuradas: Inserta el registro en la tabla `contactos` de Supabase usando el cliente seguro de servidor.
+### Endpoints disponibles
 
-### 2. Configuración de Variables de Entorno (`.env.local`)
-Crea un archivo llamado `.env.local` en la raíz del proyecto con la siguiente estructura:
+| Endpoint | Método | Descripción |
+|---|---|---|
+| `/api/contact` | `POST` | Recepción de cotizaciones del formulario web |
+| `/api/agendar-reunion` | `POST` | Creación de reuniones en Supabase + fallback Excel |
+| `/api/admin/data` | `GET` | KPIs, leads y reuniones (requiere `x-admin-token`) |
+| `/api/admin/data` | `PATCH` | Actualizar estado de lead/reunión (requiere `x-admin-token`) |
+
+### Protección del endpoint admin
+- Header requerido: `x-admin-token: saikora2026`
+- Sin el header → `401 Unauthorized`
+
+---
+
+## 🔐 Consola Administrativa /admin
+
+**URL:** `/admin` (producción: `https://saikoraorg.vercel.app/admin`)  
+**PIN de acceso:** `saikora2026`  
+**Autenticación:** `sessionStorage` del navegador + header `x-admin-token` en cada request de API.
+
+### Funcionalidades del Dashboard
+
+| Módulo | Descripción |
+|---|---|
+| **KPIs Ejecutivos** | Total leads, leads nuevos, tasa de conversión %, reuniones activas, reuniones completadas |
+| **Demanda por Servicio** | Barras horizontales con % de solicitudes por categoría |
+| **Plataformas de Reunión** | Desglose de Meet / Zoom / WhatsApp / Llamada / Presencial |
+| **Calendario Mensual** | Calendario interactivo con reuniones agendadas por día, clic para ver detalle + link de reunión |
+| **Bandeja CRM** | Lista de leads con filtros por estado, edición inline de estado (nuevo→contactado→cotizado→ganado/perdido) |
+| **Tiempo Real** | Supabase Realtime suscriptions — se refresca automáticamente al llegar nuevos leads o reuniones |
+
+### Para acceder en local
+```
+http://localhost:3000/admin
+```
+
+---
+
+## ⚙️ Variables de Entorno y Configuración
+
+Crear `.env.local` en la raíz del proyecto:
 
 ```env
-# URL de tu proyecto en Supabase (Settings > API)
+# URL del proyecto en Supabase (Settings > API)
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxxxxxxxxxx.supabase.co
 
-# Llave anónima pública (Settings > API > Project API Keys > anon/public)
+# Llave anónima pública (Settings > API > anon/public)
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
 
-# Llave de rol de servicio privada (Settings > API > Project API Keys > service_role)
-# NUNCA compartir ni exponer en el cliente
+# Llave de rol de servicio — SOLO servidor, NUNCA exponer al cliente
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
 ```
 
-### 3. Ejecución del Schema en Supabase
-El script completo con tablas, índices, políticas de seguridad RLS y disparadores está listo en [supabase/schema.sql](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/supabase/schema.sql).
-
-Pasos para aplicarlo:
-1. Entra a tu dashboard en [supabase.com](https://supabase.com).
-2. Selecciona tu proyecto y abre la pestaña **SQL Editor**.
-3. Pega el contenido de [supabase/schema.sql](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/supabase/schema.sql) y presiona **Run**.
-4. ¡Listo! Las tablas `contactos`, `proyectos` y `servicios` quedarán operativas con seguridad RLS activada.
-
-## 🛡️ Auditoría y Blindaje de Seguridad (Test de Seguridad)
-
-Se realizó un análisis defensivo integral sobre la aplicación y el endpoint de API. A continuación se detallan las protecciones implementadas y probadas con éxito:
-
-### 1. Cabeceras HTTP de Seguridad ([next.config.js](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/next.config.js))
-- **`X-Frame-Options: DENY`**: Bloquea la incrustación del sitio en iframes de terceros, previniendo ataques de Clickjacking.
-- **`X-Content-Type-Options: nosniff`**: Impide que los navegadores interpreten archivos con tipos MIME incorrectos (MIME sniffing).
-- **`Strict-Transport-Security (HSTS)`**: Fuerza el uso exclusivo de conexiones HTTPS cifradas (`max-age=63072000; includeSubDomains; preload`).
-- **`Referrer-Policy: strict-origin-when-cross-origin`**: Protege la privacidad evitando la fuga de URLs internas en enlaces salientes.
-- **`Permissions-Policy`**: Deshabilita accesos innecesarios a hardware sensible (`camera=(), microphone=(), geolocation=()`).
-- **`Content-Security-Policy (CSP)`**: Restringe la carga de scripts, fuentes y estilos a orígenes de confianza (Google Fonts, cdnjs, jsdelivr, Supabase).
-- **`poweredByHeader: false`**: Oculta el banner `X-Powered-By: Next.js` para evitar el fingerprinting del stack técnico.
-
-### 2. Blindaje de la API de Contacto ([src/app/api/contact/route.ts](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/app/api/contact/route.ts))
-- **Limitador de Tasa por IP (Rate Limiter)**: Permite un máximo de **5 solicitudes por minuto por IP**. A la 6ª solicitud devuelve status `429 Too Many Requests`, protegiendo la base de datos contra ataques DoS y flooding de bots.
-- **Sanitización de Entradas**: Eliminación automática de etiquetas HTML (`<script>`, etc.) y caracteres de control para mitigar inyecciones XSS y ataques de payload malicioso.
-- **Límites de Longitud Estrictos**:
-  - `nombre`: 2 - 100 caracteres.
-  - `email`: Máximo 120 caracteres validado contra RFC regex.
-  - `servicio`: Validación estricta contra whitelist permitida.
-  - `mensaje`: 5 - 2000 caracteres.
-- **Aislamiento de Secretos**: `SUPABASE_SERVICE_ROLE_KEY` reside exclusivamente en el entorno del servidor y nunca se expone al cliente.
+> **En Vercel:** Settings → Environment Variables → agregar las 3 variables arriba.
 
 ---
 
-## 👥 Módulo de Clientes y Pop-up de Casos ([src/components/Stats.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Stats.tsx))
+## 🚀 Despliegue: GitHub + Vercel
 
-El bloque de estadísticas inferior (`+10 Proyectos completados`, etc.) fue rediseñado como una barra flotante en píldora idéntica al diseño de referencia e integrado con un sistema interactivo de proyectos:
-- **Clientes destacados disponibles**:
-  1. **On Fleek**: Sistema de agendamiento y reserva de citas 24/7 con recordatorios por WhatsApp.
-  2. **Restaurante La Finca**: Automatización de comandas táctiles POS e inventario en cocina en tiempo real.
-  3. **Aura Store**: Tienda online de alta conversión con checkout móvil y pagos seguros.
-  4. **Logística Express**: Plataforma de tracking en tiempo real con geolocalización de mensajeros.
-- **Interacción**: Al hacer clic en "+10 Proyectos" o en cualquiera de las píldoras de clientes, se abre un **Modal Popup** con diseño glassmorphism que detalla:
-  - Ficha del proyecto con tags de categoría.
-  - Descripción completa del problema resuelto y la solución creada.
-  - Métricas de impacto cuantificables (ej. *85% reducción de citas perdidas*).
-  - Lista de funcionalidades implementadas con checkmarks.
-  - Tecnologías utilizadas y botón directo para solicitar una cotización similar.
+### Estado actual de commits en `main`
 
----
+| Commit | Descripción |
+|---|---|
+| `f4eb79b` | feat(admin): consola administrativa privada con analytics, calendario y tiempo real |
+| `b332fcd` | feat(db): arquitectura integral de base de datos Supabase y backend de reuniones |
+| `6218920` | feat: optimizaciones responsive, nuevo ícono 3D Hero, carrusel táctil, corrección Stats |
+| `f45b177` | Primer commit: web oficial de Saikora completa |
 
-## 📌 Backlog Activo y Tareas Pendientes (Roadmap)
+### Configurar dominio `saikora.org` en Vercel
+1. En Vercel → tu proyecto → **Settings → Domains**
+2. Agregar `saikora.org` y `www.saikora.org`
+3. En tu proveedor DNS (Namecheap):
+   - **A Record:** `@` → `76.76.21.21`
+   - **CNAME:** `www` → `cname.vercel-dns.com`
+4. Esperar propagación DNS (1–48 horas)
 
-Este apartado contiene las tareas en curso, pendientes de configuración externa o mejoras planificadas para las siguientes fases:
-
-### Fase 1: Despliegue y Conexión en Vivo (Prioridad Inmediata)
-- [ ] **Configurar llaves de Supabase en `.env.local`**: El usuario debe vincular su cuenta y proyecto real de Supabase siguiendo [supabase/SETUP.md](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/supabase/SETUP.md).
-- [ ] **Vincular enlace real de Calendly**: Reemplazar `https://calendly.com` en [Contact.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Contact.tsx) por la URL del calendario oficial de Saikora.
-- [ ] **Actualizar canales de contacto definitivos**: Confirmar teléfono oficial de WhatsApp y correo de soporte en [Contact.tsx](file:///c:/Users/santi/OneDrive/Desktop/Saikora%20Pagina/src/components/Contact.tsx).
-- [ ] **Despliegue a producción (Vercel / Netlify / Host propio)**:
-  - Configurar las 3 variables de entorno de Supabase en el panel de hosting.
-  - Apuntar el dominio personalizado (ej. `saikora.com`) mediante registros DNS A / CNAME.
-
-### Fase 2: Automatizaciones y Notificaciones
-- [ ] **Notificaciones por Correo Electrónico**: Implementar webhook o integración con Resend / SendGrid para enviar una alerta instantánea al equipo de Saikora cada vez que un lead completa el formulario de cotización.
-- [ ] **Auto-respuesta al cliente**: Enviar un email de confirmación automático al prospecto asegurando que su mensaje fue recibido.
-- [ ] **Integración con WhatsApp Business API / Webhook**: Botón directo para iniciar conversación con mensaje prellenado desde el sitio.
-
-### Fase 3: Mejoras de Contenido y Expansión
-- [ ] **Páginas de Detalle para Casos de Éxito**: Rutas dinámicas `/proyectos/[id]` con capturas detalladas del sistema de Restaurante La Finca, métricas y testimonios de clientes.
-- [ ] **Panel de Administración Interno (CMS)**: Interfaz protegida para consultar solicitudes recibidas desde Supabase y gestionar el estado (`pendiente`, `revisado`, `respondido`).
-- [ ] **Soporte Multilenguaje (i18n)**: Soporte para alternar entre Español e Inglés para clientes internacionales.
-- [ ] **Google Analytics 4 / Meta Pixel**: Inserción de scripts de seguimiento de conversiones para campañas de marketing digital.
+### Variables de entorno en Vercel (obligatorio para Supabase)
+1. Vercel → proyecto → **Settings → Environment Variables**
+2. Agregar: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+3. Hacer **Redeploy** para que las variables entren en efecto.
 
 ---
 
-> *Para actualizar este handoff conforme se completen tareas o se añadan nuevos requerimientos, simplemente edita este archivo marcando las casillas `[x]` o agregando nuevas secciones según corresponda.*
+## 🛡️ Seguridad
+
+### Headers HTTP (`next.config.js`)
+- `X-Frame-Options: DENY` — bloquea clickjacking via iframes
+- `X-Content-Type-Options: nosniff` — previene MIME sniffing
+- `Strict-Transport-Security` — HTTPS forzado con `max-age=63072000`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy` — deshabilita camera, micrófono, geolocalización
+- `Content-Security-Policy` — whitelist de Google Fonts, cdnjs, Supabase
+- `poweredByHeader: false` — oculta fingerprint del stack
+
+### API de Contacto (`/api/contact`)
+- **Rate limiter por IP:** máx 5 req/min → `429 Too Many Requests`
+- **Sanitización de inputs:** elimina HTML tags y caracteres de control
+- **Límites de longitud:** nombre 2–100, email ≤120, mensaje 5–2000 chars
+- **Isolación de secretos:** `SUPABASE_SERVICE_ROLE_KEY` solo en servidor
+
+---
+
+## 📌 Backlog Activo y Roadmap
+
+### ✅ Fase 1 — Completada
+- [x] Frontend v1: Navbar, Hero, Services, Stats, Cases, Contact, Footer
+- [x] Seguridad blindada: headers, CSP, rate limiter, sanitización
+- [x] Responsive mobile completo
+
+### ✅ Fase 2 — Completada
+- [x] Hero 3D: escultura con ícono recortado `saikora-icon.png` y pedestal luminoso
+- [x] Services: carrusel táctil/arrastrable con auto-scroll infinito
+- [x] Stats: grid 2×2 responsive (elimina clipping en mobile)
+- [x] DB Supabase: 5 tablas, RLS, triggers, 4 vistas analíticas, seed data
+- [x] API `/api/agendar-reunion`: insert en Supabase + fallback Excel
+- [x] Admin dashboard `/admin`: PIN auth, KPIs, calendario, CRM, Realtime
+- [x] API `/api/admin/data`: protegida con token, GET y PATCH
+
+### 🔲 Fase 3 — Pendiente
+- [ ] **Supabase configurado en Vercel:** agregar las 3 variables de entorno en Settings → Environment Variables
+- [ ] **Dominio `saikora.org`:** configurar DNS en Namecheap → apuntar a Vercel
+- [ ] **Link real de Calendly:** reemplazar placeholder en `Contact.tsx`
+- [ ] **Teléfono y email definitivos:** confirmar datos de contacto en `Contact.tsx`
+- [ ] **Notificaciones por email:** integrar Resend o SendGrid cuando llega un lead
+- [ ] **Auto-respuesta al cliente:** email de confirmación automático al prospecto
+- [ ] **Google Analytics 4 / Meta Pixel:** para campañas de marketing
+
+---
+
+> *Para actualizar este handoff, editar este archivo marcando las casillas `[x]` o añadiendo nuevas secciones.*
