@@ -15,7 +15,6 @@ function sanitize(str: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const XLSX = await import('xlsx')
     const body = await request.json()
     const { nombre, email, telefono, fecha, hora, medio, notas } = body
 
@@ -34,75 +33,108 @@ export async function POST(request: NextRequest) {
     const cleanMedio = sanitize(medio)
     const cleanNotas = notas ? sanitize(notas) : ''
 
-    // File path in the root of the project
-    const filePath = path.join(process.cwd(), 'reuniones_agendadas.xlsx')
+    // 1. Guardado en Supabase (PostgreSQL) si las llaves están configuradas
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    let existingData: Record<string, string | number>[] = []
-
-    if (fs.existsSync(filePath)) {
+    if (supabaseUrl && supabaseKey && supabaseUrl !== 'your_supabase_project_url') {
       try {
-        const fileBuffer = fs.readFileSync(filePath)
-        const workbook = XLSX.read(fileBuffer, { type: 'buffer' })
-        const sheetName = workbook.SheetNames[0] || 'Reuniones'
-        const sheet = workbook.Sheets[sheetName]
-        if (sheet) {
-          existingData = XLSX.utils.sheet_to_json(sheet)
+        const { createServerSupabaseClient } = await import('@/lib/supabase')
+        const supabase = createServerSupabaseClient()
+        const { error: dbError } = await supabase.from('reuniones').insert([
+          {
+            nombre: cleanNombre,
+            email: cleanEmail,
+            telefono: cleanTelefono || null,
+            fecha_reunion: cleanFecha,
+            hora_reunion: cleanHora,
+            medio: cleanMedio,
+            tema: cleanNotas || 'Consulta general',
+            estado: 'agendada',
+          },
+        ])
+        if (dbError) {
+          console.warn('Aviso: no se pudo insertar en Supabase (verifique schema):', dbError.message)
+        } else {
+          console.log('✅ Reunión guardada exitosamente en Supabase (PostgreSQL)')
         }
-      } catch (e) {
-        console.warn('No se pudo leer archivo existente, se creará uno nuevo:', e)
-        existingData = []
+      } catch (dbErr) {
+        console.warn('Error de conexión con Supabase en agendar-reunion:', dbErr)
       }
     }
 
-    const newMeeting = {
-      'N°': existingData.length + 1,
-      'Fecha Registro': new Date().toLocaleString('es-CR'),
-      'Nombre / Cliente': cleanNombre,
-      'Correo Electrónico': cleanEmail,
-      'Teléfono / WhatsApp': cleanTelefono || 'No proporcionado',
-      'Fecha de Reunión': cleanFecha,
-      'Hora de Reunión': cleanHora,
-      'Medio / Plataforma': cleanMedio,
-      'Tema / Notas': cleanNotas || 'Consulta general',
-      'Estado': 'Agendada',
+    // 2. Respaldo en Excel local (reuniones_agendadas.xlsx) con manejo resiliente en Serverless
+    try {
+      const XLSX = await import('xlsx')
+      const filePath = path.join(process.cwd(), 'reuniones_agendadas.xlsx')
+      let existingData: Record<string, string | number>[] = []
+
+      if (fs.existsSync(filePath)) {
+        try {
+          const fileBuffer = fs.readFileSync(filePath)
+          const workbook = XLSX.read(fileBuffer, { type: 'buffer' })
+          const sheetName = workbook.SheetNames[0] || 'Reuniones'
+          const sheet = workbook.Sheets[sheetName]
+          if (sheet) {
+            existingData = XLSX.utils.sheet_to_json(sheet)
+          }
+        } catch {
+          existingData = []
+        }
+      }
+
+      const newMeeting = {
+        'N°': existingData.length + 1,
+        'Fecha Registro': new Date().toLocaleString('es-CR'),
+        'Nombre / Cliente': cleanNombre,
+        'Correo Electrónico': cleanEmail,
+        'Teléfono / WhatsApp': cleanTelefono || 'No proporcionado',
+        'Fecha de Reunión': cleanFecha,
+        'Hora de Reunión': cleanHora,
+        'Medio / Plataforma': cleanMedio,
+        'Tema / Notas': cleanNotas || 'Consulta general',
+        'Estado': 'Agendada',
+      }
+
+      const updatedData = [...existingData, newMeeting]
+      const newWorksheet = XLSX.utils.json_to_sheet(updatedData)
+
+      newWorksheet['!cols'] = [
+        { wch: 6 },  // N°
+        { wch: 20 }, // Fecha Registro
+        { wch: 25 }, // Nombre
+        { wch: 28 }, // Correo
+        { wch: 20 }, // Teléfono
+        { wch: 16 }, // Fecha Reunión
+        { wch: 16 }, // Hora Reunión
+        { wch: 20 }, // Medio
+        { wch: 35 }, // Tema
+        { wch: 14 }, // Estado
+      ]
+
+      const newWorkbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, 'Reuniones')
+      const buffer = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'buffer' })
+      fs.writeFileSync(filePath, buffer)
+    } catch (fsErr) {
+      // En entornos Serverless de solo lectura (como Vercel lambda), no bloquea la respuesta exitosa
+      console.warn('Nota: archivo Excel omitido en entorno de solo lectura:', fsErr)
     }
 
-    const updatedData = [...existingData, newMeeting]
-
-    // Create new workbook and sheet
-    const newWorksheet = XLSX.utils.json_to_sheet(updatedData)
-
-    // Set column widths for a polished look in Excel
-    newWorksheet['!cols'] = [
-      { wch: 6 },  // N°
-      { wch: 20 }, // Fecha Registro
-      { wch: 25 }, // Nombre
-      { wch: 28 }, // Correo
-      { wch: 20 }, // Teléfono
-      { wch: 16 }, // Fecha Reunión
-      { wch: 16 }, // Hora Reunión
-      { wch: 20 }, // Medio
-      { wch: 35 }, // Tema
-      { wch: 14 }, // Estado
-    ]
-
-    const newWorkbook = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, 'Reuniones')
-
-    // Write file to disk
-    const buffer = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'buffer' })
-    fs.writeFileSync(filePath, buffer)
-
-    // Enviar notificación por correo a saikorasupport@gmail.com
-    await sendMeetingNotification({
-      nombre: cleanNombre,
-      email: cleanEmail,
-      telefono: cleanTelefono,
-      fecha: cleanFecha,
-      hora: cleanHora,
-      medio: cleanMedio,
-      notas: cleanNotas,
-    })
+    // 3. Notificación por correo electrónico
+    try {
+      await sendMeetingNotification({
+        nombre: cleanNombre,
+        email: cleanEmail,
+        telefono: cleanTelefono,
+        fecha: cleanFecha,
+        hora: cleanHora,
+        medio: cleanMedio,
+        notas: cleanNotas,
+      })
+    } catch (mailErr) {
+      console.error('Error enviando notificación por correo:', mailErr)
+    }
 
     return NextResponse.json({
       success: true,
@@ -116,9 +148,9 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error: any) {
-    console.error('Error al agendar reunión en Excel:', error)
+    console.error('Error al agendar reunión:', error)
     return NextResponse.json(
-      { error: error?.message || 'Ocurrió un error al guardar la reunión. Inténtalo de nuevo.' },
+      { error: error?.message || 'Ocurrió un error al procesar la reunión. Inténtalo de nuevo.' },
       { status: 500 }
     )
   }
