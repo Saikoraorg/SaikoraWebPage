@@ -58,7 +58,7 @@ export default function Hero() {
               <div className="hero-pedestal-ring" />
 
               {/* Central 3D Ribbon S sculpture */}
-              <div className="hero-logo-3d position-relative" style={{ overflow: 'hidden' }}>
+              <div className="hero-logo-3d position-relative">
                 <Image
                   src="/saikora-icon.png"
                   alt="Saikora 3D Visual"

@@ -408,9 +408,8 @@ h1,h2,h3,h4,h5,h6 { font-weight: 800; line-height: 1.15; letter-spacing: -0.025e
 .hero-ribbon-img {
   width: 100% !important;
   height: 100% !important;
-  max-height: 350px;
-  object-fit: cover;
-  object-position: center 0%;
+  max-height: 380px;
+  object-fit: contain;
   mix-blend-mode: multiply;
   filter: drop-shadow(0 25px 35px rgba(26, 30, 41, 0.15)) drop-shadow(0 0 45px rgba(25, 195, 160, 0.4));
 }
@@ -418,7 +417,6 @@ h1,h2,h3,h4,h5,h6 { font-weight: 800; line-height: 1.15; letter-spacing: -0.025e
 .hero-logo-3d {
   animation: heroFloat 7s ease-in-out infinite;
   filter: drop-shadow(0 30px 60px rgba(25,195,160,0.35));
-  overflow: hidden;
 }
 
 @keyframes heroFloat {
