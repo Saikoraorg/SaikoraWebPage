@@ -53,17 +53,13 @@ export default function Hero() {
           {/* Right 3D Showcase */}
           <div className="col-lg-6">
             <div className="hero-visual">
-              {/* Glowing Pedestal Base */}
-              <div className="hero-pedestal-glow" />
-              <div className="hero-pedestal-ring" />
-
               {/* Central 3D Ribbon S sculpture */}
               <div className="hero-logo-3d position-relative">
                 <Image
                   src="/saikora-icon.png"
                   alt="Saikora 3D Visual"
-                  width={510}
-                  height={510}
+                  width={460}
+                  height={637}
                   className="hero-ribbon-img"
                   priority
                 />
